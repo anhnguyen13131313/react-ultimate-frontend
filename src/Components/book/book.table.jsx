@@ -1,6 +1,6 @@
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { message, Popconfirm, Table } from "antd";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { deleteBookAPI, fetchBookAPI } from "../../services/api.service";
 import ViewBookDetail from "./view.book.detail";
 import BookForm from "./book.form";
@@ -21,10 +21,12 @@ const BookTable = () => {
 
   const [dataUpdate, setDataUpdate] = useState(null);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [loadingTable, setLoadingTable] = useState(false);
   useEffect(() => {
     loadBook();
   }, [current, pageSize]);
   const loadBook = async () => {
+    setLoadingTable(true);
     const res = await fetchBookAPI(current, pageSize);
     if (res.data && res.data.result) {
       setDataBook(res.data.result);
@@ -32,7 +34,9 @@ const BookTable = () => {
       setCurrent(res.data.meta.current);
       setPageSize(res.data.meta.pageSize);
     }
+    setLoadingTable(false);
   };
+
   const columns = [
     {
       title: "STT",
@@ -132,6 +136,7 @@ const BookTable = () => {
           total: total,
         }}
         onChange={onChange}
+        loading={loadingTable}
       />
       {/* <UpdateBookControl
         dataUpdate={dataUpdate}
